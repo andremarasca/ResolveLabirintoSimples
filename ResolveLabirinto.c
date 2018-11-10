@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define MM 3000
+
 #define PAREDE 2147483647
 #define LIVRE 2147483646
 #define CAMINHO 2147483645
-int mapa[MM][MM];
+
+int **mapa;
 
 typedef struct nodo
 {
@@ -114,43 +115,61 @@ void caminha (int m, int n, int ei, int ej, int i, int j)
     mapa[i][j] = CAMINHO;
 }
 
+int **int2Dmalloc(int M, int N)
+{
+    unsigned int i;
+    int **A = (int **)malloc(M*sizeof(int *));
+    for(i = 0; i < M; i++) A[i] = (int *)malloc(N*sizeof(int));
+    return A;
+}
+
+void int2Dfree(int **A, int M)
+{
+    int i;
+    for(i = 0; i < M; i++)
+    {
+        free(A[i]);
+    }
+    free(A);
+}
+
 int main (void)
 {
-    char p5[3];
-    int m, n, k;
+    int m, n;
     int i, j, ei, ej, si, sj;
-    scanf("P5\n# CREATOR: GIMP PNM Filter Version 1.1\n%d %d\n255\n", &m, &n);
-    printf("P2 %d %d 255 ", m, n);
-    char ima;
-    k = 1;
+    int x;
+    scanf("%d %d", &m, &n);
+    printf("%d %d\n", m, n);
+    mapa = int2Dmalloc(m, n);
     ei = ej = si = sj = 0;
-    for(i = 0; i < n; i++)
+    for(i = 0; i < m; i++)
     {
-        for(j = 0; j < m; j++)
+        for(j = 0; j < n; j++)
         {
-            scanf("%c", &ima);
-            if(i == 0 || j == 0 || i == (n - 1) || j == (m - 1) || ima == ' ') mapa[i][j] = PAREDE;
-            else mapa[i][j] = LIVRE;
-            if(ima == 10) j--;
-            if(!(i == 0 || j == 0 || i == (n - 1) || j == (m - 1)) && (i == 1 || j == 1 || i == (n - 2) || j == (m - 2)) && ima != ' ')
-            {
-                if(k) ei = i, ej = j;
-                else  si = i, sj = j;
-                k = 0;
-            }
+            scanf("%d", &x);
+            if(i == 0 || j == 0 || i == (m - 1) || j == (n - 1) || x == 0)
+                mapa[i][j] = PAREDE;
+            else
+                mapa[i][j] = LIVRE;
+            if(0 < x && x <= 128)
+                ei = i, ej = j;
+            else if(128 < x && x < 255)
+                si = i, sj = j;
         }
     }
     inundacao (m, n, ei, ej, si, sj);
     caminha (m, n, ei, ej, si, sj);
-    for(i = 0; i < n; i++)
+    for(i = 0; i < m; i++)
     {
-        for(j = 0; j < m; j++)
+        for(j = 0; j < n; j++)
         {
-            if(i == 0 || j == 0 || i == (n - 1) || j == (m - 1)) printf("255 ");
+            if(i == 0 || j == 0 || i == (m - 1) || j == (n - 1)) printf("0 ");
             else if(mapa[i][j] == PAREDE) printf("0 ");
             else if(mapa[i][j] == CAMINHO) printf("127 ");
             else printf("255 ");
         }
+        printf("\n");
     }
+    int2Dfree(mapa, m);
     return 0;
 }

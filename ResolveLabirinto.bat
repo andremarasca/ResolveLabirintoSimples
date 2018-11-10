@@ -1,2 +1,1 @@
-ResolveLabirinto.exe < PGM/Entrada/Labirinto4.pgm > PGM/Saida/Labirinto4.pgm
-pause
+ResolveLabirinto.exe <Entrada/Labirinto1.txt >Saida/Labirinto1.txt 
